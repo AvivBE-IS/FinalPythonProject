@@ -1,1 +1,53 @@
-<!-- Data page template -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>🐧 Explore Penguin Data</h1>
+
+    <form action="/data" method="get" class="data-form">
+        
+        <div class="form-group">
+            <label>Columns:</label>
+            <input type="text" name="cols" placeholder="e.g. species, island">
+        </div>
+
+        <div class="form-group">
+            <label>Filter Column:</label>
+            <select name="filter_col">
+                <option value="">-- None --</option>
+                <option value="species">Species</option>
+                <option value="island">Island</option>
+                <option value="body_mass_g">Body Mass (g)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Operator:</label>
+            <select name="op">
+                <option value="==">==</option>
+                <option value=">">></option>
+                <option value="<"><</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Value:</label>
+            <input type="text" name="value" placeholder="Value...">
+        </div>
+
+        <div class="form-group">
+            <button type="submit">🔍 Filter</button>
+        </div>
+    </form>
+
+    {% if error %}
+        <div style="color: red; text-align: center;">{{ error }}</div>
+    {% endif %}
+
+    {% if table %}
+        <div style="overflow-x: auto;">
+            {{ table | safe }}
+        </div>
+    {% else %}
+        <p style="text-align: center;">No data found.</p>
+    {% endif %}
+{% endblock %}

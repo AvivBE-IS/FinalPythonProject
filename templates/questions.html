@@ -1,9 +1,76 @@
-<h1>{{ title }}</h1>
+{% extends "base.html" %}
 
-<div class="analysis-result">
-    {{ result | safe }} 
+{% block content %}
+
+<div style="display: flex; flex-wrap: wrap; gap: 30px; min-height: 400px;">
+
+    <div style="flex: 1; min-width: 250px; border-right: 1px solid #eee; padding-right: 20px;">
+        <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
+            📊 Analysis Menu
+        </h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="/questions/1" class="q-btn">1. Species Distribution</a>
+            <a href="/questions/2" class="q-btn">2. Body Mass vs. Flipper</a>
+            <a href="/questions/3" class="q-btn">3. Island Distribution</a>
+            <a href="/questions/4" class="q-btn">4. Culmen Length Stats</a>
+            <a href="/questions/5" class="q-btn">5. Sex Distribution</a>
+        </div>
+    </div>
+
+    <div style="flex: 3; min-width: 300px;">
+        
+        {% if question_id %}
+            
+            <h2 style="color: #2c3e50; margin-top: 0;">{{ title }}</h2>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #27ae60; margin-bottom: 20px;">
+                <strong>Analysis Result:</strong>
+                <div style="margin-top: 10px;">
+                    {{ result | safe }}
+                </div>
+            </div>
+
+            {% if plot_url %}
+                <div style="text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                    <img src="{{ plot_url }}" alt="Analysis Plot" style="max-width: 100%; height: auto; border-radius: 4px;">
+                </div>
+            {% else %}
+                <p style="color: red;">No plot generated for this question.</p>
+            {% endif %}
+
+        {% else %}
+            
+            <div style="text-align: center; margin-top: 50px; color: #7f8c8d;">
+                <h2 style="font-size: 3rem; margin-bottom: 10px;">👈</h2>
+                <h3>Select a question from the menu to see insights.</h3>
+                <p>Each question will generate a unique visualization and data analysis.</p>
+            </div>
+            
+        {% endif %}
+
+    </div>
+
 </div>
 
-<div class="plot">
-    <img src="{{ plot_url }}" alt="Analysis Plot">
-</div>
+<style>
+    .q-btn {
+        display: block;
+        padding: 12px 15px;
+        background-color: #ecf0f1;
+        color: #2c3e50;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: all 0.2s;
+        border-left: 5px solid transparent;
+    }
+
+    /* Hover effect to make it look interactive */
+    .q-btn:hover {
+        background-color: #e3e6e8;
+        border-left: 5px solid #3498db;
+        padding-left: 20px; /* Slight movement animation */
+    }
+</style>
+
+{% endblock %}

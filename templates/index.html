@@ -1,40 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Penguin Analysis - Questions</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <nav>
-        <a href="/">Home</a> | <a href="/questions">Questions</a> | <a href="/data">Get Data</a>
-    </nav>
+{% extends "base.html" %}
 
-    <h1>Penguin Data Analysis</h1>
-
-    <div class="menu">
-        <label>Select Analysis:</label>
-        <select onchange="window.location.href='/questions/' + this.value">
-            <option value="">-- Choose a Question --</option>
-            <option value="1" {% if question_id == 1 %}selected{% endif %}>1. Avg Mass by Species</option>
-            <option value="2" {% if question_id == 2 %}selected{% endif %}>2. Flipper vs Bill Size</option>
-            <option value="3" {% if question_id == 3 %}selected{% endif %}>3. Population by Island</option>
-            <option value="4" {% if question_id == 4 %}selected{% endif %}>4. Bill Depth Dist.</option>
-            <option value="5" {% if question_id == 5 %}selected{% endif %}>5. Body Mass by Sex</option>
-        </select>
+{% block content %}
+    <h1>Welcome to the Penguin Project 🐧</h1>
+    
+    <div style="text-align: center; margin-top: 40px;">
+        <p style="font-size: 1.2rem;">
+            This project analyzes the Palmer Penguins dataset using Python and FastAPI.
+        </p>
+        
+        <div style="margin-top: 30px;">
+            <a href="/questions">
+                <button style="padding: 15px 30px; font-size: 1.1rem;">Go to Questions</button>
+            </a>
+            
+            <a href="/data">
+                <button style="padding: 15px 30px; font-size: 1.1rem; background-color: #2980b9; margin-left: 10px;">
+                    Explore Data
+                </button>
+            </a>
+        </div>
     </div>
-
-    <hr>
-
-    {% if question_id %}
-        <h2>{{ title }}</h2>
-        <div class="analysis-output">
-            {{ result | safe }}
-        </div>
-        <div class="plot-output">
-            <img src="{{ plot_url }}" alt="Analysis Plot">
-        </div>
-    {% else %}
-        <p>Please select a question from the menu above to start the analysis.</p>
-    {% endif %}
-</body>
-</html>
+{% endblock %}
