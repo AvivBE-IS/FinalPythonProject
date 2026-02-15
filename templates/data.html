@@ -1,53 +1,310 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <style>
+        .container {
+            max-width: 95% !important;
+        }
+        table {
+            font-size: 1.1rem;
+        }
+        th, td {
+            padding: 15px;
+        }
+        .col-circle {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .col-circle input {
+            display: none;
+        }
+        .col-circle span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            color: #555;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 2px;
+            word-wrap: break-word;
+            line-height: 1.1;
+            font-weight: 600;
+        }
+        .col-circle input:checked + span {
+            background-color: #3498db;
+            border-color: #2980b9;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+            z-index: 1;
+        }
+        .col-circle:hover span {
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+        .col-circle input:checked:hover + span {
+            transform: scale(1.1) translateY(-2px);
+        }
+        /* Asymmetric positioning */
+        .col-circle:nth-child(odd) {
+            margin-top: 10px;
+        }
+        .col-circle:nth-child(even) {
+            margin-top: 40px;
+        }
+        .col-circle:nth-child(3n) {
+            margin-top: 0px;
+        }
+        .col-circle:nth-child(5n) {
+            margin-top: 25px;
+        }
+        .penguin-compliment {
+            position: absolute;
+            pointer-events: none;
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 2px solid #3498db;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            animation: floatUp 4s ease-out forwards;
+            z-index: 10000;
+            white-space: nowrap;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            20% { transform: translateY(-10px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1); }
+        }
+    </style>
+
     <h1>🐧 Explore Penguin Data</h1>
 
     <form action="/data" method="get" class="data-form">
         
-        <div class="form-group">
-            <label>Columns:</label>
-            <input type="text" name="cols" placeholder="e.g. species, island">
-        </div>
+        <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; width: 100%;">
 
-        <div class="form-group">
-            <label>Filter Column:</label>
-            <select name="filter_col">
-                <option value="">-- None --</option>
-                <option value="species">Species</option>
-                <option value="island">Island</option>
-                <option value="body_mass_g">Body Mass (g)</option>
-            </select>
-        </div>
+            <div style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; justify-content: center;">
+                
+                <div class="form-group">
+                    <select name="filter_col" id="filter_col_select" style="height: 60px; width: 250px; font-size: 1.5rem; text-align: center;" onchange="updateFormFields()">
+                        <option value="">Filter By</option>
+                        {% for col in columns_metadata.keys() %}
+                            <option value="{{ col }}" {% if current_filter == col %}selected{% endif %}>
+                                {{ col }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <div class="form-group">
-            <label>Operator:</label>
-            <select name="op">
-                <option value="==">==</option>
-                <option value=">">></option>
-                <option value="<"><</option>
-            </select>
-        </div>
+                <div class="form-group">
+                    <select name="op" id="op_select" style="height: 60px; width: 250px; font-size: 1.5rem; text-align: center;">
+                        </select>
+                </div>
 
-        <div class="form-group">
-            <label>Value:</label>
-            <input type="text" name="value" placeholder="Value...">
-        </div>
+                <div class="form-group">
+                    <select name="value" id="value_select" style="height: 60px; width: 250px; font-size: 1.5rem; text-align: center;">
+                         </select>
+                </div>
 
-        <div class="form-group">
-            <button type="submit">🔍 Filter</button>
+                <div class="form-group">
+                    <button type="submit" style="height: 60px; background-color: transparent; border: none; cursor: pointer; font-size: 2.5rem; line-height: 60px; margin-bottom: 10px;">
+                        🔍
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="form-group" style="flex: 1; min-width: 300px; width: 100%; align-items: center;">
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 25px; justify-content: center;">
+                    {% for col in columns_metadata.keys() %}
+                        <label class="col-circle" title="{{ col }}" style="{{ 'width: 155px; height: 155px;' if col == 'flipper_length_mm' else ('width: 140px; height: 140px;' if col == 'bill_length_mm' else '') }}">
+                            <input type="checkbox" name="cols" value="{{ col }}" checked onchange="toggleColumn(this.value, this.checked)">
+                            <span>{{ col }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                <small style="color: gray; font-size: 1.2rem; margin-top: 35px; display: block;">Click bubbles to toggle</small>
+            </div>
         </div>
     </form>
 
+    <hr>
+
     {% if error %}
-        <div style="color: red; text-align: center;">{{ error }}</div>
+        <div style="color: #721c24; background-color: #f8d7da; padding: 10px; border-radius: 4px; text-align: center; margin: 20px; border: 1px solid #f5c6cb;">
+            <strong>⚠️ Notice:</strong> {{ error }}
+        </div>
     {% endif %}
 
-    {% if table %}
-        <div style="overflow-x: auto;">
+    <div style="overflow-x: auto; margin-top: 20px;">
+        {% if table %}
             {{ table | safe }}
-        </div>
-    {% else %}
-        <p style="text-align: center;">No data found.</p>
-    {% endif %}
+        {% else %}
+            <p style="text-align: center; color: gray;">No data available.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        // Pass metadata from Python to JavaScript safely using tojson
+        const columnsData = {{ columns_metadata | tojson }};
+        const currentOp = "{{ current_op }}";
+        const currentVal = "{{ current_val }}";
+
+        function updateFormFields() {
+            const colSelect = document.getElementById("filter_col_select");
+            const opSelect = document.getElementById("op_select");
+            const valSelect = document.getElementById("value_select");
+            
+            const selectedCol = colSelect.value;
+            
+            // Clear existing options
+            opSelect.innerHTML = "";
+            valSelect.innerHTML = "";
+
+            if (!selectedCol) {
+                // Default state if no column is selected
+                opSelect.add(new Option("Op", ""));
+                valSelect.add(new Option("Value", ""));
+                return;
+            }
+
+            // Get metadata for the selected column
+            const colInfo = columnsData[selectedCol];
+            
+            // 1. Update Operators based on column type
+            if (colInfo.is_numeric) {
+                // Numeric operators
+                const ops = ["==", "!=", ">", "<", ">=", "<="];
+                ops.forEach(op => {
+                    opSelect.add(new Option(op, op));
+                });
+            } else {
+                // String operators (restricted set)
+                const ops = ["==", "contains"];
+                ops.forEach(op => {
+                    opSelect.add(new Option(op, op));
+                });
+            }
+
+            // Restore previous Operator selection if valid
+            if (currentOp && Array.from(opSelect.options).some(o => o.value === currentOp)) {
+                opSelect.value = currentOp;
+            }
+
+            // 2. Update Values Dropdown
+            // Add a default empty option
+            valSelect.add(new Option("Value", ""));
+            
+            // Populate with unique values from metadata (limit to 10)
+            colInfo.unique_values.slice(0, 10).forEach(val => {
+                valSelect.add(new Option(val, val));
+            });
+
+            // Restore previous Value selection if valid
+            if (currentVal) {
+                // Loop to find matching value (handles string vs number loosely)
+                for (let i = 0; i < valSelect.options.length; i++) {
+                    if (valSelect.options[i].value == currentVal) {
+                        valSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        function toggleColumn(colName, isChecked) {
+            const table = document.querySelector('table');
+            if (!table) return;
+            
+            const headers = table.querySelectorAll('thead th');
+            let colIndex = -1;
+            
+            // Find the column index by header text
+            for (let i = 0; i < headers.length; i++) {
+                if (headers[i].textContent.trim() === colName) {
+                    colIndex = i + 1; // nth-child is 1-based
+                    break;
+                }
+            }
+            
+            if (colIndex === -1) return;
+            
+            // Toggle header and all cells in that column
+            const cells = table.querySelectorAll(`tr > *:nth-child(${colIndex})`);
+            cells.forEach(cell => {
+                cell.style.display = isChecked ? '' : 'none';
+            });
+        }
+
+        // Initialize form fields on page load
+        window.onload = updateFormFields;
+
+        // Penguin Compliments on Click
+        const compliments = [
+            "You are a dam smart Penguin! 🧠",
+            "You are the best Penguin I ever knew! 🏆",
+            "You're cooler than an iceberg! 🧊",
+            "You slide through data like a pro! ⛸️",
+            "You're flippin' awesome! 🤸",
+            "Looking sharp in that tuxedo! 🤵",
+            "You're the emperor of this analysis! 👑",
+            "Waddle you do without your smarts? 🚶",
+            "You're ice cold (in a cool way)! 😎",
+            "Great job, Captain Penguin! 🫡",
+            "You've got happy feet! 🦶",
+            "You're swimming in success! 🏊",
+            "No cold feet here, just confidence! 🔥",
+            "You're a penguin genius! 💡",
+            "You crack the ice with your skills! ⛏️",
+            "You're the coolest bird in the flock! 🐦",
+            "Sliding into success! 🛝",
+            "You're a rockhopper star! 🎸",
+            "P-E-N-G-U-I-N power! 🔋",
+            "You make the Antarctic look warm! ☀️"
+        ];
+
+        let activeCompliment = null;
+
+        document.addEventListener('click', function(e) {
+            // Show compliments only when clicking bubbles
+            if (!e.target.closest('.col-circle')) {
+                return;
+            }
+
+            if (activeCompliment) {
+                activeCompliment.remove();
+            }
+
+            const text = compliments[Math.floor(Math.random() * compliments.length)];
+            const el = document.createElement('div');
+            el.className = 'penguin-compliment';
+            el.innerText = "🐧 " + text;
+            el.style.left = e.pageX + 'px';
+            el.style.top = e.pageY + 'px';
+            document.body.appendChild(el);
+            activeCompliment = el;
+
+            setTimeout(() => {
+                if (activeCompliment === el) {
+                    el.remove();
+                    activeCompliment = null;
+                }
+            }, 4000);
+        });
+    </script>
+
 {% endblock %}
