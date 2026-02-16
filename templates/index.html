@@ -1,1 +1,23 @@
-<!-- Main index page template -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Welcome to the Penguin Project 🐧</h1>
+    
+    <div style="text-align: center; margin-top: 40px;">
+        <p style="font-size: 1.2rem;">
+            This project analyzes the Palmer Penguins dataset using Python and FastAPI.
+        </p>
+        
+        <div style="margin-top: 30px;">
+            <a href="/questions">
+                <button style="padding: 15px 30px; font-size: 1.1rem;">Go to Questions</button>
+            </a>
+            
+            <a href="/data">
+                <button style="padding: 15px 30px; font-size: 1.1rem; background-color: #2980b9; margin-left: 10px;">
+                    Explore Data
+                </button>
+            </a>
+        </div>
+    </div>
+{% endblock %}
