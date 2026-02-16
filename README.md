@@ -1,4 +1,3 @@
-# FinalPythonProject
 # 🐧 Palmer Penguins Analysis Web App
 
 A data analysis and exploration web application built with **FastAPI**. This project was developed as a Capstone Project for the **CyberProAI** course. It provides an interactive interface to explore the Palmer Penguins dataset, filter data, and generate dynamic visualizations.
@@ -31,26 +30,42 @@ A data analysis and exploration web application built with **FastAPI**. This pro
 ├── data/
 │   └── penguins.csv     # The dataset
 └── requirements.txt     # Python dependencies
+```
 
-⚙️ Installation & Setup
-Clone the repository:
+## ⚙️ Installation
 
-Bash
+### 1. Clone the repository
+```bash
 git clone [https://github.com/your-username/penguins-analysis.git](https://github.com/your-username/penguins-analysis.git)
 cd penguins-analysis
+```
 
-Virtual environment (optional but recommended):
-Bash:
+### 2. Create a virtual environment
+**Windows:**
+```bash
 python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
+venv\Scripts\activate
+```
 
-Install dependencies:
-Bash
+**macOS / Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install dependencies
+```bash
 pip install -r requirements.txt
-Run the application:
+```
 
-Bash
+## ▶️ How to Run
+
+**1. Start the server:**
+Run the following command to start the application with live reload:
+```bash
 uvicorn main:app --reload
-Access the app:
-Open your browser and go to http://127.0.0.1:8000.
+```
 
+**2. Access the application:**
+Open your web browser and navigate to:
+http://127.0.0.1:8000
